@@ -2,7 +2,7 @@
 
 > Application web et mobile de gestion intelligente de la consommation énergétique
 
-## 👥 Équipe — ISG Bizerte | AGL 2025/2026
+## 👥 Équipe — ISG Bizerte | AGL 2026/2027
 
 | Membre | Rôle |
 |--------|------|
