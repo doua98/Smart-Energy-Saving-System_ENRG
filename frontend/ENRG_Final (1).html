@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENRG – Smart Energy Saving System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --g:#00C896;--g2:#00A87A;--g3:#007A58;--gl:rgba(0,200,150,0.12);
+  --a:#FF9500;--al:rgba(255,149,0,0.12);
+  --r:#FF453A;--rl:rgba(255,69,58,0.12);
+  --b:#0A84FF;--bl:rgba(10,132,255,0.12);
+  --p:#BF5AF2;--pl:rgba(191,90,242,0.12);
+  --bg:#0D0F14;--bg2:#13161D;--bg3:#1A1E28;--bg4:#222736;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#F0F2FF;--text2:#8B90A8;--text3:#4A4F63;
+  --r8:8px;--r12:12px;--r16:16px;--r20:20px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button,input,select{font-family:inherit;}
+::selection{background:var(--gl);color:var(--g);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ─── AUTH ─── */
+#auth{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.auth-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,200,150,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(10,132,255,0.1) 0%,transparent 50%),var(--bg);}
+.auth-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black,transparent);}
+.auth-card{position:relative;z-index:1;background:rgba(19,22,29,0.9);border:1px solid var(--border2);border-radius:24px;padding:2.5rem;width:100%;max-width:420px;backdrop-filter:blur(20px);box-shadow:0 24px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.07);}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:.5rem;}
+.auth-logo-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,200,150,0.35);}
+.auth-logo-icon svg{width:26px;height:26px;}
+.auth-brand{font-size:26px;font-weight:800;background:linear-gradient(135deg,#fff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.auth-tagline{text-align:center;font-size:12px;color:var(--text2);margin-bottom:1.75rem;letter-spacing:.03em;}
+.auth-tabs{display:flex;background:var(--bg3);border-radius:var(--r12);padding:4px;margin-bottom:1.5rem;gap:4px;}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border-radius:var(--r8);color:var(--text2);background:none;border:none;transition:all .25s;}
+.auth-tab.active{background:var(--g);color:#000;box-shadow:0 4px 12px rgba(0,200,150,0.35);}
+.form{display:flex;flex-direction:column;gap:12px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fl{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;}
+.fi{padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);font-size:14px;color:var(--text);outline:none;transition:all .2s;}
+.fi:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gl);}
+.btn-g{background:linear-gradient(135deg,var(--g),var(--g2));color:#000;border:none;padding:13px;border-radius:var(--r12);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px;letter-spacing:.02em;}
+.btn-g:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,200,150,0.4);}
+.btn-g:active{transform:translateY(0);}
+.hint{font-size:11px;color:var(--text3);text-align:center;line-height:1.6;}
+.hint strong{color:var(--text2);}
+.msg-e{background:var(--rl);border:1px solid var(--r);color:var(--r);font-size:12px;padding:9px 12px;border-radius:var(--r8);display:none;}
+.msg-ok{background:var(--gl);border:1px solid var(--g);color:var(--g);font-size:12px;padding:9px 12px;border-radius:var(--r8);display:none;}
+
+/* ─── APP SHELL ─── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.topbar{height:62px;background:rgba(13,15,20,0.92);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);}
+.tl{display:flex;align-items:center;gap:12px;}
+.tlogo{width:34px;height:34px;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,200,150,0.3);}
+.tlogo svg{width:18px;height:18px;}
+.ttitle{font-size:16px;font-weight:800;background:linear-gradient(135deg,#fff,var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.live-indicator{display:flex;align-items:center;gap:6px;background:var(--gl);border:1px solid rgba(0,200,150,0.2);padding:4px 10px;border-radius:20px;font-size:11px;color:var(--g);font-weight:600;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+.tr{display:flex;align-items:center;gap:10px;}
+.ubadge{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);padding:5px 12px 5px 7px;border-radius:20px;font-size:13px;font-weight:500;}
+.uavatar{width:28px;height:28px;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;}
+.btn-out{background:none;border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;}
+.btn-out:hover{border-color:var(--r);color:var(--r);}
+
+/* ─── LAYOUT ─── */
+.layout{display:flex;flex:1;}
+.sidebar{width:228px;background:var(--bg2);border-right:1px solid var(--border);padding:1rem .75rem;display:flex;flex-direction:column;gap:2px;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;}
+.nsec{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:12px 10px 4px;}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r8);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;position:relative;}
+.ni:hover{background:var(--bg3);color:var(--text);}
+.ni.active{background:var(--gl);color:var(--g);}
+.ni.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--g);border-radius:0 3px 3px 0;}
+.ni-icon{font-size:16px;width:20px;text-align:center;}
+.nbadge{margin-left:auto;background:var(--r);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+.content{flex:1;padding:1.75rem;max-width:1100px;overflow-y:auto;}
+.panel{display:none;animation:fadeUp .3s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── COMPONENTS ─── */
+.ph{margin-bottom:1.5rem;}
+.pt{font-size:22px;font-weight:800;color:var(--text);margin-bottom:.2rem;}
+.ps{font-size:13px;color:var(--text2);}
+
+/* Metric Cards */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem;}
+.mc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:18px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+.mc:hover{transform:translateY(-2px);border-color:var(--border2);}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r16) var(--r16) 0 0;}
+.mc.green::before{background:linear-gradient(90deg,var(--g),transparent);}
+.mc.amber::before{background:linear-gradient(90deg,var(--a),transparent);}
+.mc.red::before{background:linear-gradient(90deg,var(--r),transparent);}
+.mc.blue::before{background:linear-gradient(90deg,var(--b),transparent);}
+.mc.purple::before{background:linear-gradient(90deg,var(--p),transparent);}
+.ml{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.mv{font-size:26px;font-weight:800;color:var(--text);line-height:1;font-family:'JetBrains Mono',monospace;}
+.mv.g{color:var(--g);}
+.mv.a{color:var(--a);}
+.mv.r{color:var(--r);}
+.ms{font-size:11px;color:var(--text3);margin-top:6px;}
+.ms.up{color:var(--r);}
+.ms.dn{color:var(--g);}
+.mc-icon{position:absolute;right:14px;top:14px;font-size:22px;opacity:.3;}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.25rem;margin-bottom:1rem;}
+.card:hover{border-color:var(--border2);}
+.ct{font-size:14px;font-weight:700;color:var(--text);margin-bottom:1rem;}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+
+/* Alert boxes */
+.abox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r12);font-size:13px;margin-bottom:1rem;}
+.abox-icon{font-size:15px;flex-shrink:0;}
+.al-a{background:var(--al);border:1px solid rgba(255,149,0,.2);color:#FFBB55;}
+.al-g{background:var(--gl);border:1px solid rgba(0,200,150,.2);color:var(--g);}
+.al-r{background:var(--rl);border:1px solid rgba(255,69,58,.2);color:#FF6B63;}
+.al-b{background:var(--bl);border:1px solid rgba(10,132,255,.2);color:#40A8FF;}
+
+/* Progress bar */
+.btrack{height:6px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.bfill{height:100%;border-radius:4px;transition:width .8s ease;}
+
+/* Badges */
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.bg{background:var(--gl);color:var(--g);}
+.ba{background:var(--al);color:var(--a);}
+.br{background:var(--rl);color:var(--r);}
+.bb{background:var(--bl);color:var(--b);}
+.bp{background:var(--pl);color:var(--p);}
+
+/* ─── LIVE GAUGE ─── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
+.gauge-canvas{filter:drop-shadow(0 0 20px rgba(0,200,150,.3));}
+.gauge-val{font-size:36px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;margin-top:-1rem;}
+.gauge-label{font-size:12px;color:var(--text2);margin-top:4px;}
+
+/* ─── LIVE FEED ─── */
+.feed-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);animation:feedIn .4s ease;}
+@keyframes feedIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.feed-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.feed-text{flex:1;font-size:12px;color:var(--text2);}
+.feed-text strong{color:var(--text);}
+.feed-time{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.feed-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+/* ─── ROOMS ─── */
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;}
+.room-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.1rem;transition:all .2s;}
+.room-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.room-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.room-name{font-size:14px;font-weight:700;color:var(--text);}
+.room-kwh{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.room-bar{margin-bottom:10px;}
+.room-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;}
+.dev-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border);}
+.dev-icon{font-size:15px;width:22px;text-align:center;}
+.dev-name{font-size:12px;color:var(--text2);flex:1;}
+.dev-watt{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.tog{position:relative;width:38px;height:22px;cursor:pointer;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.togs{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;transition:.25s;}
+.togs:before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:.25s;}
+.tog input:checked+.togs{background:var(--g);border-color:var(--g);box-shadow:0 0 12px rgba(0,200,150,.4);}
+.tog input:checked+.togs:before{transform:translateX(16px);background:#000;}
+.room-power{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;color:var(--text3);}
+.room-power span:last-child{font-weight:700;color:var(--g);font-family:'JetBrains Mono',monospace;}
+
+/* ─── ALERTS ─── */
+.alert-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--border);border-radius:var(--r12);background:var(--bg2);margin-bottom:8px;transition:all .2s;}
+.alert-item:hover{border-color:var(--border2);}
+.alert-item.unread{border-left:3px solid var(--r);}
+.alert-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.alert-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.alert-desc{font-size:12px;color:var(--text2);line-height:1.55;}
+.alert-time{font-size:11px;color:var(--text3);margin-top:5px;font-family:'JetBrains Mono',monospace;}
+
+/* ─── TIPS/RECOS ─── */
+.reco{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid var(--border);border-radius:var(--r16);background:var(--bg2);margin-bottom:10px;transition:all .25s;}
+.reco:hover{border-color:var(--border2);transform:translateX(3px);}
+.reco.done{opacity:.38;}
+.reco-icon{font-size:26px;flex-shrink:0;width:46px;height:46px;background:var(--bg3);border-radius:var(--r12);display:flex;align-items:center;justify-content:center;}
+.reco-body{flex:1;}
+.reco-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.reco-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.reco-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.reco-save{font-size:12px;color:var(--g);font-weight:700;}
+.btn-apply{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:none;color:var(--text2);cursor:pointer;transition:all .2s;}
+.btn-apply:hover{background:var(--g);color:#000;border-color:var(--g);}
+.btn-apply.done{background:var(--gl);color:var(--g);border-color:rgba(0,200,150,.3);}
+
+/* ─── SCHEDULE ─── */
+.sch-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--border);}
+.sch-time{font-size:12px;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:100px;}
+.sch-desc{font-size:13px;color:var(--text2);flex:1;}
+
+/* ─── GOALS ─── */
+.goal-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--border);}
+.goal-ico{width:40px;height:40px;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.goal-info{flex:1;}
+.goal-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.goal-pct{font-size:14px;font-weight:800;min-width:44px;text-align:right;font-family:'JetBrains Mono',monospace;}
+
+/* ─── SIMULATOR ─── */
+.sim-group{margin-bottom:16px;}
+.sim-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:7px;}
+.sim-label span:last-child{font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;}
+input[type=range]{width:100%;height:4px;accent-color:var(--g);cursor:pointer;border-radius:4px;}
+
+/* ─── DATA INPUT ─── */
+.dcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.1rem;transition:border-color .2s;}
+.dcard:hover{border-color:var(--border2);}
+.dcard-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.dfield{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.dfield label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.dfield input,.dfield select{padding:9px 11px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);font-size:13px;color:var(--text);outline:none;transition:all .2s;}
+.dfield input:focus,.dfield select:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gl);}
+.btn-upd{background:linear-gradient(135deg,var(--g),var(--g2));color:#000;border:none;padding:9px;border-radius:var(--r8);font-size:12px;font-weight:700;cursor:pointer;width:100%;transition:all .2s;margin-top:4px;}
+.btn-upd:hover{opacity:.9;}
+.upd-ok{font-size:11px;color:var(--g);text-align:center;margin-top:5px;display:none;}
+
+/* ─── PROFILE ─── */
+.pfield{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border);}
+.pkey{font-size:13px;color:var(--text2);}
+.pval{font-size:13px;font-weight:600;color:var(--text);}
+.pavatar{width:72px;height:72px;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#000;margin:0 auto 1.25rem;box-shadow:0 8px 32px rgba(0,200,150,0.35);}
+
+/* ─── ADMIN TABLE ─── */
+.utable{width:100%;border-collapse:collapse;font-size:13px;}
+.utable th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.utable td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text2);}
+.utable tr:hover td{background:var(--bg3);}
+
+/* ─── CHART ─── */
+.cwrap{position:relative;width:100%;}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--text2);}
+.ldot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle;}
+
+/* ─── ENERGY RING ─── */
+.energy-ring-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+.ring-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.25rem;display:flex;align-items:center;gap:16px;}
+.ring-info{flex:1;}
+.ring-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.ring-val{font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+.ring-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* ─── COMPARE ─── */
+.compare-bar{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);}
+.compare-label{font-size:12px;color:var(--text2);width:120px;flex-shrink:0;}
+.compare-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.compare-fill{height:100%;border-radius:4px;}
+.compare-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;width:60px;text-align:right;}
+
+/* RESPONSIVE */
+@media(max-width:750px){.sidebar{display:none;}.content{padding:1rem;}.form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH ═══ -->
+<div id="auth">
+  <div class="auth-bg"></div>
+  <div class="auth-grid"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <span class="auth-brand">ENRG</span>
+    </div>
+    <p class="auth-tagline">Smart Energy Saving System &mdash; AGL 2025/2026</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-l" onclick="showTab('l')">Connexion</button>
+      <button class="auth-tab" id="tab-r" onclick="showTab('r')">Inscription</button>
+    </div>
+    <div id="fl" class="form">
+      <div class="fg"><label class="fl">Adresse e-mail</label><input class="fi" type="email" id="le" placeholder="vous@email.com"></div>
+      <div class="fg"><label class="fl">Mot de passe</label><input class="fi" type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+      <div class="msg-e" id="lerr"></div>
+      <button class="btn-g" onclick="login()">Se connecter</button>
+      <p class="hint">Compte test : <strong>test@enrg.com</strong> / <strong>1234</strong><br>Admin : <strong>admin@enrg.com</strong> / <strong>admin</strong></p>
+    </div>
+    <div id="fr" class="form" style="display:none;">
+      <div class="form-row">
+        <div class="fg"><label class="fl">Prenom</label><input class="fi" type="text" id="rpr" placeholder="Prenom"></div>
+        <div class="fg"><label class="fl">Nom</label><input class="fi" type="text" id="rno" placeholder="Nom"></div>
+      </div>
+      <div class="fg"><label class="fl">E-mail</label><input class="fi" type="email" id="rem" placeholder="email@exemple.com"></div>
+      <div class="fg"><label class="fl">Mot de passe</label><input class="fi" type="password" id="rpa" placeholder="Min 4 caracteres"></div>
+      <div class="form-row">
+        <div class="fg"><label class="fl">Ville</label><input class="fi" type="text" id="rvi" placeholder="Tunis"></div>
+        <div class="fg"><label class="fl">Logement</label><select class="fi" id="rty"><option value="appartement">Appartement</option><option value="maison">Maison</option><option value="villa">Villa</option></select></div>
+      </div>
+      <div class="fg"><label class="fl">Surface (m2)</label><input class="fi" type="number" id="rsu" placeholder="80"></div>
+      <div class="msg-e" id="rerr"></div>
+      <div class="msg-ok" id="rok"></div>
+      <button class="btn-g" onclick="register()">Creer mon compte</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <div class="topbar">
+    <div class="tl">
+      <div class="tlogo"><svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <span class="ttitle">ENRG Smart Energy</span>
+      <div class="live-indicator"><span class="live-dot"></span>LIVE</div>
+    </div>
+    <div class="tr">
+      <div class="ubadge"><div class="uavatar" id="tav">?</div><span id="tnm">User</span></div>
+      <button class="btn-out" onclick="logout()">Deconnexion</button>
+    </div>
+  </div>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="nsec">Tableau de bord</div>
+      <button class="ni active" onclick="go('dashboard',this)"><span class="ni-icon">⚡</span>Vue generale</button>
+      <button class="ni" onclick="go('live',this)"><span class="ni-icon">📡</span>Donnees en direct<span class="nbadge" id="live-badge">LIVE</span></button>
+      <div class="nsec">Gestion</div>
+      <button class="ni" onclick="go('appareils',this)"><span class="ni-icon">🏠</span>Appareils & Pieces</button>
+      <button class="ni" onclick="go('monitoring',this)"><span class="ni-icon">🎛</span>Saisie capteurs</button>
+      <button class="ni" onclick="go('alertes',this)"><span class="ni-icon">🔔</span>Alertes <span class="nbadge" id="alert-badge">3</span></button>
+      <div class="nsec">Optimisation</div>
+      <button class="ni" onclick="go('reco',this)"><span class="ni-icon">🤖</span>Recommandations IA</button>
+      <button class="ni" onclick="go('planning',this)"><span class="ni-icon">🗓</span>Planning intelligent</button>
+      <button class="ni" onclick="go('simulateur',this)"><span class="ni-icon">🔬</span>Simulateur</button>
+      <div class="nsec">Suivi</div>
+      <button class="ni" onclick="go('objectifs',this)"><span class="ni-icon">🎯</span>Objectifs</button>
+      <button class="ni" onclick="go('compare',this)"><span class="ni-icon">📊</span>Comparaison</button>
+      <button class="ni" onclick="go('rapports',this)"><span class="ni-icon">📈</span>Historique</button>
+      <button class="ni" onclick="go('profil',this)"><span class="ni-icon">👤</span>Mon profil</button>
+      <button class="ni" id="nav-admin" style="display:none;" onclick="go('admin',this)"><span class="ni-icon">⚙️</span>Administration</button>
+    </nav>
+
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="ph"><div class="pt" id="dash-title">Tableau de bord</div><div class="ps" id="dash-sub">Chargement...</div></div>
+        <div class="abox al-a" id="peak-alert"><span class="abox-icon">⚡</span><span>Heure de pointe 18h–21h detectee. Decalez vos appareils pour economiser jusqu'a <strong>20%</strong> sur votre facture.</span></div>
+        <div class="metrics">
+          <div class="mc amber"><span class="mc-icon">⚡</span><div class="ml">Aujourd'hui</div><div class="mv a" id="m-today">--</div><div class="ms up" id="m-today-trend">...</div></div>
+          <div class="mc green"><span class="mc-icon">📅</span><div class="ml">Ce mois</div><div class="mv" id="m-month">--</div><div class="ms" id="m-budget">Budget: 350 kWh</div></div>
+          <div class="mc green"><span class="mc-icon">💰</span><div class="ml">Facture estimee</div><div class="mv g" id="m-bill">--</div><div class="ms dn">Economie ce mois</div></div>
+          <div class="mc blue"><span class="mc-icon">🌿</span><div class="ml">CO2 economise</div><div class="mv" id="m-co2" style="color:var(--g)">--</div><div class="ms">vs mois precedent</div></div>
+          <div class="mc red"><span class="mc-icon">🔔</span><div class="ml">Alertes actives</div><div class="mv r">3</div><div class="ms up">2 critiques</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:1rem;">
+          <div class="card"><div class="ct">Consommation horaire — Aujourd'hui</div><div class="cwrap" style="height:220px;"><canvas id="c-hourly"></canvas></div></div>
+          <div class="card"><div class="ct">Par categorie</div><div class="legend" id="pie-leg"></div><div class="cwrap" style="height:170px;"><canvas id="c-pie"></canvas></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="card"><div class="ct">Puissance actuelle par piece</div><div id="room-bars"></div></div>
+          <div class="card"><div class="ct">Activite recente</div><div id="live-feed" style="max-height:200px;overflow:hidden;"></div></div>
+        </div>
+      </div>
+
+      <!-- LIVE DATA -->
+      <div class="panel" id="panel-live">
+        <div class="ph"><div class="pt">Donnees en direct</div><div class="ps">Flux temps reel simule — dans la version connectee: MQTT + WebSocket IoT</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:1rem;" id="live-cards"></div>
+        <div class="card"><div class="ct">Courbe de puissance — 60 derniers points (mise a jour toutes les 2s)</div><div class="cwrap" style="height:220px;"><canvas id="c-live"></canvas></div></div>
+        <div class="card"><div class="ct">Journal des evenements IoT</div><div id="iot-log" style="max-height:300px;overflow-y:auto;"></div></div>
+      </div>
+
+      <!-- APPAREILS -->
+      <div class="panel" id="panel-appareils">
+        <div class="ph"><div class="pt">Appareils & Pieces</div><div class="ps">Controle a distance — F06 du cahier des charges</div></div>
+        <div class="rooms-grid" id="rooms-grid"></div>
+      </div>
+
+      <!-- MONITORING (DATA INPUT) -->
+      <div class="panel" id="panel-monitoring">
+        <div class="ph"><div class="pt">Saisie des capteurs IoT</div><div class="ps">F03 — Entrez les releves reels pour alimenter le tableau de bord</div></div>
+        <div class="abox al-b"><span class="abox-icon">ℹ</span><span>Version connectee: donnees recues automatiquement via <strong>MQTT/WebSocket</strong>. Protocole prevu: <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;">mqtt://broker:1883/home/sensors</code></span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;" id="data-grid"></div>
+      </div>
+
+      <!-- ALERTES -->
+      <div class="panel" id="panel-alertes">
+        <div class="ph"><div class="pt">Alertes intelligentes</div><div class="ps">F04 — Notifications en cas de depassement de seuils</div></div>
+        <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
+          <button onclick="filterA('all',this)" id="af-all" style="padding:6px 16px;border-radius:20px;border:1px solid rgba(0,200,150,.3);background:var(--gl);color:var(--g);font-size:12px;font-weight:600;cursor:pointer;">Toutes</button>
+          <button onclick="filterA('critique',this)" id="af-critique" style="padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Critiques</button>
+          <button onclick="filterA('avertissement',this)" id="af-avert" style="padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Avertissements</button>
+          <button onclick="markAllRead()" style="margin-left:auto;padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Tout marquer lu</button>
+        </div>
+        <div id="alerts-list"></div>
+      </div>
+
+      <!-- RECOS IA -->
+      <div class="panel" id="panel-reco">
+        <div class="ph"><div class="pt">Recommandations IA</div><div class="ps">F05 — Suggestions personnalisees basees sur vos habitudes de consommation</div></div>
+        <div class="abox al-g"><span class="abox-icon">🤖</span><span>Notre moteur IA analyse <strong id="reco-analyzed">14 jours</strong> de donnees et genere des recommandations classees par impact potentiel. <strong id="reco-total-save">Economie totale potentielle : 4 900 DA/mois</strong></span></div>
+        <div id="reco-list"></div>
+      </div>
+
+      <!-- PLANNING -->
+      <div class="panel" id="panel-planning">
+        <div class="ph"><div class="pt">Planning intelligent</div><div class="ps">Automatisation des actions d'economie d'energie</div></div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+          <div class="card"><div class="ct">Programme du jour — <span id="today-date"></span></div><div id="planning-list"></div></div>
+          <div>
+            <div class="card">
+              <div class="ct">Heure actuelle</div>
+              <div style="font-size:36px;font-weight:800;color:var(--g);font-family:'JetBrains Mono',monospace;text-align:center;padding:.5rem 0;" id="clock">--:--</div>
+            </div>
+            <div class="card"><div class="ct">Conseil maintenant</div><div class="abox al-g" style="margin:0;"><span class="abox-icon">💡</span><span id="current-advice">Chargement...</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATEUR -->
+      <div class="panel" id="panel-simulateur">
+        <div class="ph"><div class="pt">Simulateur d'economies</div><div class="ps">Estimez vos economies potentielles en ajustant vos habitudes</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="card">
+            <div class="ct">Parametres de simulation</div>
+            <div class="sim-group"><div class="sim-label"><span>Thermostat nuit (reduction)</span><span id="sv1">3 C</span></div><input type="range" min="0" max="6" value="3" step="1" oninput="simU()" id="sl1"></div>
+            <div class="sim-group"><div class="sim-label"><span>Appareils decales hors pointe</span><span id="sv2">2</span></div><input type="range" min="0" max="6" value="2" step="1" oninput="simU()" id="sl2"></div>
+            <div class="sim-group"><div class="sim-label"><span>Veilles debranches</span><span id="sv3">4</span></div><input type="range" min="0" max="10" value="4" step="1" oninput="simU()" id="sl3"></div>
+            <div class="sim-group"><div class="sim-label"><span>Ampoules LED remplacees</span><span id="sv4">5</span></div><input type="range" min="0" max="20" value="5" step="1" oninput="simU()" id="sl4"></div>
+            <div class="sim-group"><div class="sim-label"><span>Lavages froid / semaine</span><span id="sv5">3</span></div><input type="range" min="0" max="7" value="3" step="1" oninput="simU()" id="sl5"></div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="ct">Resultats estimes</div>
+              <div class="mc green" style="margin-bottom:10px;"><div class="ml">Economie mensuelle</div><div class="mv g" id="sim-money">--</div></div>
+              <div class="mc green" style="margin-bottom:10px;"><div class="ml">kWh economises / mois</div><div class="mv g" id="sim-kwh">--</div></div>
+              <div class="mc blue"><div class="ml">CO2 evite / mois</div><div class="mv" style="color:var(--b)" id="sim-co2">--</div></div>
+            </div>
+            <div class="card"><div class="ct">Projection annuelle</div><div class="cwrap" style="height:160px;"><canvas id="c-sim"></canvas></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBJECTIFS -->
+      <div class="panel" id="panel-objectifs">
+        <div class="ph"><div class="pt">Objectifs d'economie</div><div class="ps">F08 — Definition et suivi d'objectifs personnalises</div></div>
+        <div class="metrics">
+          <div class="mc green"><div class="ml">Objectif mensuel</div><div class="mv">350 kWh</div><div class="ms">89% utilise</div></div>
+          <div class="mc green"><div class="ml">Serie actuelle</div><div class="mv g">12 jours</div><div class="ms">Sous l'objectif</div></div>
+          <div class="mc purple"><div class="ml">Score ecologique</div><div class="mv" style="color:var(--p)">82/100</div><div class="ms">Top 25% foyers</div></div>
+          <div class="mc blue"><div class="ml">Economies cumulees</div><div class="mv" style="color:var(--b)">14 600 DA</div><div class="ms">Cette annee</div></div>
+        </div>
+        <div class="card"><div class="ct">Progression des objectifs</div><div id="goals-list"></div></div>
+        <div class="card">
+          <div class="ct">Ajouter un objectif</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="dfield" style="flex:2;min-width:160px;"><label>Type</label><select class="fi" id="goal-type"><option value="mensuel">Reduction mensuelle (%)</option><option value="quotidien">Limite quotidienne (kWh)</option><option value="veille">Sans veille (jours)</option></select></div>
+            <div class="dfield" style="flex:1;min-width:90px;"><label>Valeur</label><input class="fi" type="number" id="goal-val" placeholder="10"></div>
+            <button class="btn-g" style="padding:11px 20px;white-space:nowrap;" onclick="addGoal()">+ Ajouter</button>
+          </div>
+          <div id="new-goals" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <!-- COMPARAISON -->
+      <div class="panel" id="panel-compare">
+        <div class="ph"><div class="pt">Comparaison & Benchmark</div><div class="ps">F09 — Comparez votre consommation avec d'autres foyers similaires</div></div>
+        <div class="metrics">
+          <div class="mc green"><div class="ml">Votre consommation</div><div class="mv g">312 kWh</div><div class="ms">Ce mois</div></div>
+          <div class="mc amber"><div class="ml">Moyenne nationale</div><div class="mv a">425 kWh</div><div class="ms">Foyers similaires</div></div>
+          <div class="mc blue"><div class="ml">Meilleure pratique</div><div class="mv" style="color:var(--b)">220 kWh</div><div class="ms">Top 10%</div></div>
+        </div>
+        <div class="card">
+          <div class="ct">Votre position vs autres foyers (surface similaire, meme ville)</div>
+          <div id="compare-bars"></div>
+        </div>
+        <div class="card">
+          <div class="ct">Evolution vs moyenne nationale</div>
+          <div class="cwrap" style="height:220px;"><canvas id="c-compare"></canvas></div>
+        </div>
+      </div>
+
+      <!-- RAPPORTS -->
+      <div class="panel" id="panel-rapports">
+        <div class="ph"><div class="pt">Historique & Rapports</div><div class="ps">F07 — Analyse sur 6 mois avec export</div></div>
+        <div class="card"><div class="ct">Consommation mensuelle vs Objectif</div><div class="legend"><span><span class="ldot" style="background:var(--g);"></span>Reel</span><span><span class="ldot" style="background:var(--a);"></span>Objectif</span></div><div class="cwrap" style="height:240px;"><canvas id="c-hist"></canvas></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="card"><div class="ct">Consommation par piece (ce mois)</div><div class="cwrap" style="height:220px;"><canvas id="c-rooms"></canvas></div></div>
+          <div class="card"><div class="ct">Tendance hebdomadaire</div><div class="cwrap" style="height:220px;"><canvas id="c-week"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="ct">Exporter les donnees</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="exportCSV()" style="padding:10px 20px;background:var(--bl);color:var(--b);border:1px solid rgba(10,132,255,.3);border-radius:var(--r8);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='var(--b)';this.style.color='#fff'" onmouseout="this.style.background='var(--bl)';this.style.color='var(--b)'">📊 Exporter CSV</button>
+            <button onclick="exportReport()" style="padding:10px 20px;background:var(--gl);color:var(--g);border:1px solid rgba(0,200,150,.3);border-radius:var(--r8);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='var(--g)';this.style.color='#000'" onmouseout="this.style.background='var(--gl)';this.style.color='var(--g)'">📄 Rapport mensuel TXT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFIL -->
+      <div class="panel" id="panel-profil">
+        <div class="ph"><div class="pt">Mon profil</div><div class="ps">F01 — Gestion du profil utilisateur</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="card"><div class="pavatar" id="p-av">?</div><div id="p-fields"></div></div>
+          <div class="card">
+            <div class="ct">Modifier les preferences</div>
+            <div class="dfield"><label>Objectif mensuel (kWh)</label><input type="number" id="e-target" value="350" class="fi"></div>
+            <div class="dfield"><label>Tarif electricite (DA/kWh)</label><input type="number" id="e-tariff" value="4.94" step="0.01" class="fi"></div>
+            <div class="dfield"><label>Seuil alerte (kWh/jour)</label><input type="number" id="e-thresh" value="20" class="fi"></div>
+            <div class="dfield"><label>Personnes dans le foyer</label><input type="number" id="e-pers" value="4" class="fi"></div>
+            <button class="btn-g" style="margin-top:8px;" onclick="saveProf()">Enregistrer</button>
+            <div class="msg-ok" id="p-saved" style="margin-top:8px;display:none;">Profil mis a jour avec succes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="panel" id="panel-admin">
+        <div class="ph"><div class="pt">Administration</div><div class="ps">F10 — Gestion des utilisateurs, appareils et configuration systeme</div></div>
+        <div class="metrics">
+          <div class="mc blue"><div class="ml">Utilisateurs</div><div class="mv" style="color:var(--b)" id="adm-u">2</div></div>
+          <div class="mc green"><div class="ml">Capteurs actifs</div><div class="mv g">4</div></div>
+          <div class="mc amber"><div class="ml">Alertes systeme</div><div class="mv a">3</div></div>
+          <div class="mc green"><div class="ml">Uptime</div><div class="mv g">99.8%</div></div>
+        </div>
+        <div class="card"><div class="ct">Utilisateurs enregistres</div><table class="utable"><thead><tr><th>Nom</th><th>Email</th><th>Role</th><th>Logement</th><th>Statut</th></tr></thead><tbody id="adm-table"></tbody></table></div>
+        <div class="card"><div class="ct">Capteurs IoT</div><table class="utable"><thead><tr><th>ID</th><th>Type</th><th>Piece</th><th>Derniere mesure</th><th>Statut</th></tr></thead><tbody><tr><td>IOT-001</td><td>Compteur electrique</td><td>General</td><td id="iot-kwh">14.2 kWh</td><td><span class="badge bg">Actif</span></td></tr><tr><td>IOT-002</td><td>Temperature</td><td>Salon</td><td id="iot-temp">22.4 C</td><td><span class="badge bg">Actif</span></td></tr><tr><td>IOT-003</td><td>Consommation prise</td><td>Cuisine</td><td>1.8 kWh</td><td><span class="badge ba">Signal faible</span></td></tr><tr><td>IOT-004</td><td>Luminosite</td><td>Bureau</td><td>420 lux</td><td><span class="badge bg">Actif</span></td></tr></tbody></table></div>
+        <div class="card"><div class="ct">Configuration systeme</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="dfield"><label>Tarif national (DA/kWh)</label><input class="fi" type="number" value="4.94" step="0.01"></div><div class="dfield"><label>Seuil alerte critique (kWh/j)</label><input class="fi" type="number" value="30"></div><div class="dfield"><label>Frequence MQTT (secondes)</label><input class="fi" type="number" value="30"></div><div class="dfield"><label>Retention donnees (mois)</label><input class="fi" type="number" value="12"></div></div><button class="btn-g" style="max-width:200px;margin-top:10px;">Sauvegarder</button></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  STORE (in-memory, 100% offline)
+// ════════════════════════════════════════
+var STORE={};
+function sg(k){try{return STORE[k]!==undefined?JSON.parse(STORE[k]):null;}catch(e){return null;}}
+function ss(k,v){STORE[k]=JSON.stringify(v);}
+
+var USERS=[
+  {email:'test@enrg.com',pass:'1234',prenom:'Nour',nom:'Guesmi',ville:'Tunis',type:'appartement',surface:'80',role:'user',target:350,tariff:4.94,thresh:20,pers:4},
+  {email:'admin@enrg.com',pass:'admin',prenom:'Admin',nom:'ENRG',ville:'Tunis',type:'maison',surface:'120',role:'admin',target:400,tariff:4.94,thresh:30,pers:2}
+];
+var CU=null;
+var alertFilter='all';
+
+// ════════════════════════════════════════
+//  LIVE DATA STATE
+// ════════════════════════════════════════
+var liveData={
+  power:12.4, temp:22.1, humidity:58,
+  today:14.2, month:312,
+  hourly:[0.3,0.2,0.2,0.1,0.2,0.5,0.9,1.1,0.8,0.6,0.5,0.4,0.7,0.5,0.4,0.5,0.6,1.2,1.4,1.1,0.8,0.6,0.5,0.4],
+  liveHistory:[],
+  history:[410,465,490,380,340,312],
+  national:[480,510,530,450,420,425],
+  weekly:[48,52,45,61,39,43,50],
+  rooms:{
+    'Salon':{kwh:4.2,pct:35,devices:[{name:'Television',icon:'📺',watt:120,on:true},{name:'Climatiseur',icon:'❄️',watt:1200,on:false},{name:'Eclairage LED',icon:'💡',watt:40,on:true}]},
+    'Cuisine':{kwh:3.8,pct:31,devices:[{name:'Refrigerateur',icon:'🧊',watt:150,on:true},{name:'Four electrique',icon:'🍳',watt:2000,on:false},{name:'Machine a cafe',icon:'☕',watt:800,on:false}]},
+    'Chambre':{kwh:1.5,pct:12,devices:[{name:'Climatiseur',icon:'❄️',watt:900,on:false},{name:'Eclairage',icon:'💡',watt:30,on:true},{name:'Chargeurs',icon:'🔌',watt:25,on:true}]},
+    'Salle de bain':{kwh:2.1,pct:17,devices:[{name:'Chauffe-eau',icon:'🚿',watt:1500,on:true},{name:'Ventilateur',icon:'💨',watt:60,on:false}]},
+    'Bureau':{kwh:2.6,pct:21,devices:[{name:'Ordinateur',icon:'💻',watt:200,on:true},{name:'Imprimante',icon:'🖨',watt:400,on:false},{name:'Eclairage bureau',icon:'💡',watt:35,on:true}]}
+  },
+  alerts:[
+    {id:1,type:'critique',title:'Depassement seuil critique',desc:'Consommation: 14.2 kWh - Seuil 12 kWh depasse de 18%. Action immediate recommandee.',time:'Il y a 2h',read:false},
+    {id:2,type:'critique',title:'Climatiseur salon allume depuis 8h',desc:'L\'appareil consomme 1200W sans interruption. Pensez a l\'eteindre pour economiser.',time:'Il y a 4h',read:false},
+    {id:3,type:'avertissement',title:'Heure de pointe imminente',desc:'La plage tarifaire de pointe commence dans 1 heure (18h-21h). Decalez vos appareils.',time:'Il y a 30min',read:false},
+    {id:4,type:'avertissement',title:'Chauffe-eau: temperature trop elevee',desc:'Temperature reglage: 70C. Recommande: 55-60C pour economiser de l\'energie.',time:'Hier 18h',read:true},
+    {id:5,type:'info',title:'Objectif mensuel: 89% atteint',desc:'Vous avez consomme 312 kWh sur 350 kWh prevus ce mois. Bravo!',time:'Aujourd\'hui 9h',read:true}
+  ],
+  feedItems:[],
+  newGoals:[]
+};
+
+// ════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════
+function showTab(t){
+  document.getElementById('tab-l').className='auth-tab'+(t==='l'?' active':'');
+  document.getElementById('tab-r').className='auth-tab'+(t==='r'?' active':'');
+  document.getElementById('fl').style.display=t==='l'?'flex':'none';
+  document.getElementById('fr').style.display=t==='r'?'flex':'none';
+}
+function showE(id,m){var el=document.getElementById(id);el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3500);}
+function showO(id,m){var el=document.getElementById(id);el.textContent=m;el.style.display='block';setTimeout(function(){el.style.display='none';},3000);}
+function login(){
+  var e=(document.getElementById('le').value||'').trim().toLowerCase();
+  var p=(document.getElementById('lp').value||'').trim();
+  if(!e||!p){showE('lerr','Veuillez remplir tous les champs.');return;}
+  var u=null;for(var i=0;i<USERS.length;i++){if(USERS[i].email===e&&USERS[i].pass===p){u=USERS[i];break;}}
+  if(!u){showE('lerr','Email ou mot de passe incorrect.');return;}
+  CU=u;startApp();
+}
+function register(){
+  var pr=(document.getElementById('rpr').value||'').trim();
+  var no=(document.getElementById('rno').value||'').trim();
+  var em=(document.getElementById('rem').value||'').trim().toLowerCase();
+  var pa=(document.getElementById('rpa').value||'').trim();
+  var vi=(document.getElementById('rvi').value||'').trim();
+  var ty=document.getElementById('rty').value;
+  var su=document.getElementById('rsu').value;
+  if(!pr||!no||!em||!pa){showE('rerr','Veuillez remplir tous les champs.');return;}
+  if(pa.length<4){showE('rerr','Mot de passe trop court (min 4).');return;}
+  for(var i=0;i<USERS.length;i++){if(USERS[i].email===em){showE('rerr','Email deja utilise.');return;}}
+  USERS.push({email:em,pass:pa,prenom:pr,nom:no,ville:vi,type:ty,surface:su,role:'user',target:350,tariff:4.94,thresh:20,pers:4});
+  showO('rok','Compte cree ! Vous pouvez vous connecter.');
+  setTimeout(function(){showTab('l');document.getElementById('le').value=em;},2000);
+}
+function logout(){CU=null;stopLive();document.getElementById('auth').style.cssText='display:flex!important';document.getElementById('app').style.cssText='display:none!important';}
+
+// ════════════════════════════════════════
+//  START APP
+// ════════════════════════════════════════
+function startApp(){
+  document.getElementById('auth').style.cssText='display:none!important';
+  document.getElementById('app').style.cssText='display:flex!important;min-height:100vh;flex-direction:column;';
+  var ini=((CU.prenom||'')[0]||'')+((CU.nom||'')[0]||'');
+  document.getElementById('tav').textContent=ini.toUpperCase();
+  document.getElementById('tnm').textContent=CU.prenom+' '+CU.nom;
+  var now=new Date();
+  document.getElementById('dash-title').textContent='Bonjour '+CU.prenom+' !';
+  document.getElementById('dash-sub').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' — Voici votre rapport energetique.';
+  if(CU.role==='admin')document.getElementById('nav-admin').style.display='flex';
+  updateMetrics();buildRooms();buildDataGrid();buildAlerts();buildRecos();buildPlanning();buildGoals();buildCompare();buildProfile();buildAdminTable();simU();setAdvice();
+  setTimeout(function(){try{drawAllCharts();}catch(e){console.log(e);}},100);
+  startLive();
+  startClock();
+}
+
+// ════════════════════════════════════════
+//  LIVE DATA ENGINE
+// ════════════════════════════════════════
+var liveInterval=null,liveInterval2=null;
+function startLive(){
+  for(var i=0;i<60;i++)liveData.liveHistory.push(liveData.power+(Math.random()-.5)*3);
+  updateLiveCards();
+  liveInterval=setInterval(function(){
+    liveData.power=Math.max(0.5,Math.min(25,liveData.power+(Math.random()-.45)*1.8));
+    liveData.temp=parseFloat((liveData.temp+(Math.random()-.5)*0.3).toFixed(1));
+    liveData.humidity=Math.round(Math.max(30,Math.min(85,liveData.humidity+(Math.random()-.5)*2)));
+    liveData.today=parseFloat((liveData.today+liveData.power/3600*2).toFixed(2));
+    liveData.liveHistory.push(parseFloat(liveData.power.toFixed(2)));
+    if(liveData.liveHistory.length>60)liveData.liveHistory.shift();
+    updateLiveCards();
+    updateMetrics();
+    addFeedItem();
+    if(Math.random()>.75)addIoTLog();
+    // Update IoT table in admin
+    var el=document.getElementById('iot-kwh');if(el)el.textContent=liveData.today.toFixed(1)+' kWh';
+    var et=document.getElementById('iot-temp');if(et)et.textContent=liveData.temp+' C';
+    try{drawLiveChart();}catch(e){}
+  },2000);
+}
+function stopLive(){if(liveInterval)clearInterval(liveInterval);if(liveInterval2)clearInterval(liveInterval2);}
+
+function updateMetrics(){
+  var d=document.getElementById('m-today');if(d)d.textContent=liveData.today.toFixed(1)+' kWh';
+  var m=document.getElementById('m-month');if(m)m.textContent=liveData.month+' kWh';
+  var b=document.getElementById('m-bill');if(b)b.textContent=Math.round(liveData.month*CU.tariff).toLocaleString('fr-FR')+' DA';
+  var c=document.getElementById('m-co2');if(c)c.textContent=Math.round(liveData.month*0.058)+' kg';
+}
+
+function updateLiveCards(){
+  var cards=[
+    {icon:'⚡',label:'Puissance actuelle',val:liveData.power.toFixed(2)+' kW',color:'var(--g)',sub:'Mise a jour en direct'},
+    {icon:'🌡',label:'Temperature',val:liveData.temp+' C',color:'var(--a)',sub:'Interieure'},
+    {icon:'💧',label:'Humidite',val:liveData.humidity+'%',color:'var(--b)',sub:'Relative'},
+    {icon:'⚡',label:'Consommation du jour',val:liveData.today.toFixed(2)+' kWh',color:'var(--p)',sub:'Cumule aujourd\'hui'}
+  ];
+  var c=document.getElementById('live-cards');
+  if(!c)return;
+  c.innerHTML=cards.map(function(k){
+    return '<div class="mc" style="border-top:2px solid '+k.color+';"><div class="ml">'+k.label+'</div><div class="mv" style="color:'+k.color+';font-size:22px;">'+k.val+'</div><div class="ms">'+k.sub+'</div></div>';
+  }).join('');
+}
+
+function addFeedItem(){
+  var events=[
+    {text:'Puissance: <strong>'+liveData.power.toFixed(1)+'kW</strong>',val:liveData.power.toFixed(2)+' kW',color:'var(--g)'},
+    {text:'Temperature interieure: <strong>'+liveData.temp+'C</strong>',val:liveData.temp+'C',color:'var(--a)'},
+    {text:'Consommation cumulee: <strong>'+liveData.today.toFixed(2)+' kWh</strong>',val:liveData.today.toFixed(2)+' kWh',color:'var(--p)'}
+  ];
+  var ev=events[Math.floor(Math.random()*events.length)];
+  var now=new Date();
+  var time=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  var feed=document.getElementById('live-feed');
+  if(!feed)return;
+  var item=document.createElement('div');
+  item.className='feed-item';
+  item.innerHTML='<div class="feed-dot" style="background:'+ev.color+';"></div><div class="feed-text">'+ev.text+'</div><div class="feed-time">'+time+'</div>';
+  feed.insertBefore(item,feed.firstChild);
+  while(feed.children.length>8)feed.removeChild(feed.lastChild);
+}
+
+function addIoTLog(){
+  var msgs=['Capteur IOT-001: releve compteur enregistre','Capteur IOT-002: temperature mise a jour','MQTT: message recu sur home/sensors/power','WebSocket: donnees envoyees au frontend','Analyse IA: pattern de consommation detecte','Alerte: seuil surveille — aucun depassement'];
+  var m=msgs[Math.floor(Math.random()*msgs.length)];
+  var now=new Date();
+  var t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  var log=document.getElementById('iot-log');
+  if(!log)return;
+  var item=document.createElement('div');
+  item.style.cssText='font-size:11px;color:var(--text2);padding:5px 0;border-top:1px solid var(--border);font-family:"JetBrains Mono",monospace;';
+  item.innerHTML='<span style="color:var(--g);">'+t+'</span> &nbsp; '+m;
+  log.insertBefore(item,log.firstChild);
+  while(log.children.length>20)log.removeChild(log.lastChild);
+}
+
+function startClock(){
+  function tick(){var now=new Date();var el=document.getElementById('clock');if(el)el.textContent=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');setAdvice();}
+  tick();liveInterval2=setInterval(tick,1000);
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+function go(name,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='simulateur')simU();
+  if(name==='rapports')setTimeout(function(){try{drawReportCharts();}catch(e){}},60);
+  if(name==='compare')setTimeout(function(){try{drawCompareChart();}catch(e){}},60);
+}
+
+// ════════════════════════════════════════
+//  ROOMS
+// ════════════════════════════════════════
+function buildRooms(){
+  var grid=document.getElementById('rooms-grid');if(!grid)return;
+  grid.innerHTML='';
+  Object.keys(liveData.rooms).forEach(function(rn){
+    var r=liveData.rooms[rn];
+    var card=document.createElement('div');card.className='room-card';
+    var aw=r.devices.filter(function(d){return d.on;}).reduce(function(s,d){return s+d.watt;},0);
+    var devs=r.devices.map(function(d,di){
+      return '<div class="dev-row"><span class="dev-icon">'+d.icon+'</span><span class="dev-name">'+d.name+'</span><span class="dev-watt">'+d.watt+'W</span><label class="tog"><input type="checkbox"'+(d.on?' checked':'')+' onchange="toggleD(\''+rn+'\','+di+',this.checked)"><span class="togs"></span></label></div>';
+    }).join('');
+    card.innerHTML='<div class="room-head"><span class="room-name">'+rn+'</span><span class="room-kwh">'+r.kwh+' kWh</span></div><div class="room-bar"><div class="room-bar-label"><span>Charge</span><span>'+r.pct+'%</span></div><div class="btrack"><div class="bfill" style="width:'+r.pct+'%;background:linear-gradient(90deg,var(--g),var(--g2));"></div></div></div>'+devs+'<div class="room-power"><span>Puissance active</span><span>'+aw+' W</span></div>';
+    grid.appendChild(card);
+  });
+  buildRoomBars();
+}
+function toggleD(room,di,val){liveData.rooms[room].devices[di].on=val;buildRooms();}
+function buildRoomBars(){
+  var el=document.getElementById('room-bars');if(!el)return;
+  el.innerHTML=Object.keys(liveData.rooms).map(function(rn){
+    var r=liveData.rooms[rn];
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);"><span style="font-size:13px;color:var(--text2);width:100px;flex-shrink:0;">'+rn+'</span><div class="btrack" style="flex:1;"><div class="bfill" style="width:'+r.pct+'%;background:linear-gradient(90deg,var(--g),var(--g2));"></div></div><span style="font-size:12px;font-weight:700;color:var(--g);font-family:JetBrains Mono,monospace;width:50px;text-align:right;">'+r.kwh+' kWh</span></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  DATA GRID
+// ════════════════════════════════════════
+function buildDataGrid(){
+  var grid=document.getElementById('data-grid');if(!grid)return;
+  var groups=[
+    {t:'Compteur electrique',icon:'⚡',f:[{l:'Releve compteur (kWh)',id:'inp-c',v:312,tp:'number'},{l:"Consommation aujourd'hui (kWh)",id:'inp-t',v:14.2,tp:'number',s:'0.1'}]},
+    {t:'Temperature & Confort',icon:'🌡',f:[{l:'Interieure (C)',id:'inp-ti',v:22,tp:'number'},{l:'Exterieure (C)',id:'inp-te',v:28,tp:'number'}]},
+    {t:'Climatisation',icon:'❄️',f:[{l:'Heures/jour',id:'inp-ch',v:6,tp:'number'},{l:'Temperature reglee (C)',id:'inp-ct',v:24,tp:'number'}]},
+    {t:'Eau chaude',icon:'🚿',f:[{l:'Temperature chauffe-eau (C)',id:'inp-wt',v:60,tp:'number'},{l:'Duree chauffe/jour (h)',id:'inp-wh',v:2,tp:'number',s:'0.5'}]},
+    {t:'Eclairage',icon:'💡',f:[{l:'Ampoules LED',id:'inp-le',v:12,tp:'number'},{l:'Heures/jour',id:'inp-lh',v:5,tp:'number',s:'0.5'}]},
+    {t:'Appareils cuisine',icon:'🍳',f:[{l:'Utilisations four/sem',id:'inp-ov',v:5,tp:'number'},{l:'Duree moyenne (min)',id:'inp-om',v:45,tp:'number'}]}
+  ];
+  grid.innerHTML='';
+  groups.forEach(function(g,gi){
+    var card=document.createElement('div');card.className='dcard';
+    var fh=g.f.map(function(f){return '<div class="dfield"><label>'+f.l+'</label><input type="'+f.tp+'" id="'+f.id+'" value="'+f.v+'"'+(f.s?' step="'+f.s+'"':'')+' class="fi"></div>';}).join('');
+    var gid='g'+gi;
+    card.innerHTML='<div class="dcard-title"><span>'+g.icon+'</span>'+g.t+'</div>'+fh+'<button class="btn-upd" onclick="updData(\''+gid+'\',\''+g.f.map(function(f){return f.id;}).join(',')+'\')">Mettre a jour</button><div class="upd-ok" id="ok-'+gid+'">Donnees enregistrees et appliquees</div>';
+    grid.appendChild(card);
+  });
+}
+function updData(gid,ids){
+  var arr=ids.split(',');
+  if(arr.indexOf('inp-c')>=0){var v=parseFloat(document.getElementById('inp-c').value);if(!isNaN(v)){liveData.month=v;}}
+  if(arr.indexOf('inp-t')>=0){var v2=parseFloat(document.getElementById('inp-t').value);if(!isNaN(v2)){liveData.today=v2;}}
+  updateMetrics();
+  var ok=document.getElementById('ok-'+gid);ok.style.display='block';setTimeout(function(){ok.style.display='none';},2500);
+}
+
+// ════════════════════════════════════════
+//  ALERTS
+// ════════════════════════════════════════
+function buildAlerts(){
+  var list=document.getElementById('alerts-list');if(!list)return;
+  list.innerHTML='';
+  var filtered=liveData.alerts.filter(function(a){return alertFilter==='all'||a.type===alertFilter;});
+  filtered.forEach(function(a){
+    var col={critique:'var(--r)',avertissement:'var(--a)',info:'var(--b)'}[a.type];
+    var cls={critique:'br',avertissement:'ba',info:'bb'}[a.type];
+    var div=document.createElement('div');
+    div.className='alert-item'+(a.read?'':' unread');
+    div.innerHTML='<div class="alert-dot" style="background:'+col+';box-shadow:0 0 8px '+col+';"></div><div style="flex:1;"><div class="alert-title">'+a.title+'</div><div class="alert-desc">'+a.desc+'</div><div class="alert-time">'+a.time+'</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><span class="badge '+cls+'">'+a.type+'</span>'+(a.read?'':'<button onclick="markR('+a.id+')" style="font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;">Lu</button>')+'</div>';
+    list.appendChild(div);
+  });
+  if(!filtered.length)list.innerHTML='<p style="font-size:13px;color:var(--text3);padding:1rem;">Aucune alerte dans cette categorie.</p>';
+}
+function filterA(t,btn){
+  alertFilter=t;
+  document.querySelectorAll('[id^="af-"]').forEach(function(b){b.style.cssText='padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;';});
+  btn.style.cssText='padding:6px 16px;border-radius:20px;border:1px solid rgba(0,200,150,.3);background:var(--gl);color:var(--g);font-size:12px;font-weight:600;cursor:pointer;';
+  buildAlerts();
+}
+function markR(id){var a=liveData.alerts.find(function(x){return x.id===id;});if(a){a.read=true;buildAlerts();}}
+function markAllRead(){liveData.alerts.forEach(function(a){a.read=true;});buildAlerts();var b=document.getElementById('alert-badge');if(b)b.style.display='none';}
+
+// ════════════════════════════════════════
+//  RECOS IA
+// ════════════════════════════════════════
+function buildRecos(){
+  var recos=[
+    {icon:'🌡',title:'Reduire thermostat de 2 C la nuit',desc:'Notre IA detecte que vous chauffez a 24C entre 23h et 6h. Cette action seule represente 12% de votre facture de chauffage.',save:'Economie : ~800 DA/mois',pri:'Haute'},
+    {icon:'🧺',title:'Laver en eau froide',desc:'Analyse de vos habitudes: 4 lavages chauds/semaine detectes. 90% de l\'energie va a chauffer l\'eau — les cycles froids sont tout aussi efficaces.',save:'Economie : ~500 DA/mois',pri:'Haute'},
+    {icon:'🔌',title:'Debrancher les veilles',desc:'6 appareils en veille permanente identifies (TV, box, chargeurs). Representent ~80W continus = 58 kWh/mois inutiles.',save:'Economie : ~400 DA/mois',pri:'Moyenne'},
+    {icon:'💡',title:'Remplacer les 4 dernieres ampoules classiques',desc:'Detecte par l\'analyse energetique: 4 ampoules non-LED dans la cuisine et le couloir. ROI en moins de 3 mois.',save:'Economie : ~1 000 DA/mois',pri:'Haute'},
+    {icon:'❄',title:'Regler climatiseur a 24 C min',desc:'Votre capteur indique thermostat a 20C. Chaque degre de moins = 6% supplementaires. 24C est la norme de confort optimale.',save:'Economie : ~1 200 DA/mois',pri:'Haute'},
+    {icon:'🚿',title:'Reduire temperature chauffe-eau',desc:'Capteur IOT: temperature actuelle 70C. 55-60C est suffisant et securise. Reduction immediate possible.',save:'Economie : ~700 DA/mois',pri:'Moyenne'},
+    {icon:'🍳',title:'Utiliser la chaleur residuelle du four',desc:'Eteignez le four 10min avant la fin de cuisson. La chaleur stockee suffit a terminer. Habit simple, gain reel.',save:'Economie : ~200 DA/mois',pri:'Faible'},
+    {icon:'☀',title:'Decaler l\'usage en heure creuse',desc:'Votre lave-linge et lave-vaisselle demarrent entre 18h-20h (pic). Decalez-les apres 22h pour un tarif reduit.',save:'Economie : ~600 DA/mois',pri:'Moyenne'}
+  ];
+  var saved=sg('rdone')||{};
+  var container=document.getElementById('reco-list');if(!container)return;
+  container.innerHTML='';
+  recos.forEach(function(r,i){
+    var isDone=saved[i]||false;
+    var pc={Haute:'br',Moyenne:'ba',Faible:'bg'}[r.pri];
+    var div=document.createElement('div');
+    div.className='reco'+(isDone?' done':'');div.id='rc-'+i;
+    div.innerHTML='<div class="reco-icon">'+r.icon+'</div><div class="reco-body"><div class="reco-title">'+r.title+'</div><div class="reco-desc">'+r.desc+'</div><div class="reco-foot"><span class="reco-save">'+r.save+'</span><span class="badge '+pc+'">'+r.pri+'</span></div></div><button class="btn-apply'+(isDone?' done':'')+'" id="rb-'+i+'" onclick="applyReco('+i+')">'+(isDone?'✓ Applique':'Appliquer')+'</button>';
+    container.appendChild(div);
+  });
+}
+function applyReco(i){
+  var saved=sg('rdone')||{};saved[i]=!saved[i];ss('rdone',saved);buildRecos();
+}
+
+// ════════════════════════════════════════
+//  PLANNING
+// ════════════════════════════════════════
+function buildPlanning(){
+  var s=[
+    {t:'06:00',d:'Chauffe-eau active (prechauffage programme)',cls:'bg',l:'Auto'},
+    {t:'07:00',d:'Climatisation demarree 30min avant reveil',cls:'bg',l:'Programme'},
+    {t:'08:30',d:'Extinction lumieres automatique (detection depart)',cls:'bb',l:'Detection'},
+    {t:'12:00-14:00',d:'Plage tarifaire de pointe — reduire usage',cls:'ba',l:'Alerte'},
+    {t:'14:00',d:'Lave-linge: demarrage automatique hors pointe',cls:'bg',l:'Decale'},
+    {t:'17:30',d:'Prechauffage four avant retour domicile',cls:'bg',l:'Programme'},
+    {t:'18:00-21:00',d:'Pic national de consommation — vigilance maximale',cls:'ba',l:'Pointe'},
+    {t:'21:00',d:'Coupure veille: TV, decodeur, console de jeux',cls:'bg',l:'Nuit'},
+    {t:'22:00',d:'Reduction thermostat de 3 C (mode nuit)',cls:'bg',l:'Sommeil'},
+    {t:'23:30',d:'Mode economie maximale active',cls:'bg',l:'Economie'}
+  ];
+  var d=new Date();
+  var el=document.getElementById('today-date');
+  if(el)el.textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  var list=document.getElementById('planning-list');if(!list)return;
+  list.innerHTML=s.map(function(x){return '<div class="sch-row"><span class="sch-time">'+x.t+'</span><span class="sch-desc">'+x.d+'</span><span class="badge '+x.cls+'">'+x.l+'</span></div>';}).join('');
+}
+function setAdvice(){
+  var h=new Date().getHours();
+  var t='';
+  if(h<6)t='Mode nuit actif. Consommation minimale. Evitez les gros appareils.';
+  else if(h<9)t='Matin: Chauffe-eau actif. Moment ideal pour douches et machines.';
+  else if(h<12)t='Matinee creuse: Ideal pour lave-linge et lave-vaisselle (tarif bas).';
+  else if(h<14)t='Plage tarifaire de pointe! Evitez four et climatiseur maintenant.';
+  else if(h<18)t='Apres-midi hors pointe: Bon moment pour les taches energivores.';
+  else if(h<21)t='Pic national de consommation. Reduisez pour aider le reseau.';
+  else t='Soiree: Activez le mode veille sur vos appareils avant de dormir.';
+  var el=document.getElementById('current-advice');if(el)el.textContent=t;
+}
+
+// ════════════════════════════════════════
+//  SIMULATOR
+// ════════════════════════════════════════
+var simCh=null;
+function simU(){
+  var v1=parseInt(document.getElementById('sl1').value);
+  var v2=parseInt(document.getElementById('sl2').value);
+  var v3=parseInt(document.getElementById('sl3').value);
+  var v4=parseInt(document.getElementById('sl4').value);
+  var v5=parseInt(document.getElementById('sl5').value);
+  document.getElementById('sv1').textContent=v1+' C';
+  document.getElementById('sv2').textContent=v2;
+  document.getElementById('sv3').textContent=v3;
+  document.getElementById('sv4').textContent=v4;
+  document.getElementById('sv5').textContent=v5;
+  var kwh=v1*12+v2*14+v3*6+v4*4+v5*3;
+  var money=Math.round(kwh*(CU?CU.tariff:4.94));
+  document.getElementById('sim-kwh').textContent=kwh+' kWh';
+  document.getElementById('sim-money').textContent=money.toLocaleString('fr-FR')+' DA';
+  document.getElementById('sim-co2').textContent=Math.round(kwh*0.5)+' kg';
+  try{
+    var c=document.getElementById('c-sim');
+    if(c&&c.parentElement.clientWidth>0){
+      if(simCh)simCh.destroy();
+      simCh=drawBar(c,[liveData.month,Math.max(0,liveData.month-kwh)],['Actuel','Avec economies'],['#FF9500','#00C896']);
+    }
+  }catch(e){}
+}
+
+// ════════════════════════════════════════
+//  GOALS
+// ════════════════════════════════════════
+function buildGoals(){
+  var goals=[
+    {icon:'🌱',label:'Reduire la consommation de 10% ce mois',pct:73,color:'var(--g)'},
+    {icon:'🔋',label:'Zero veille pendant 30 jours consecutifs',pct:40,color:'var(--a)'},
+    {icon:'☀',label:'50% de la consommation avant 17h',pct:61,color:'var(--b)'},
+    {icon:'💧',label:'Reduire l\'eau chaude de 15%',pct:88,color:'var(--g)'},
+    {icon:'🌍',label:'Moins de 5 kg CO2/jour pendant 2 semaines',pct:55,color:'var(--p)'}
+  ];
+  var list=document.getElementById('goals-list');if(!list)return;
+  list.innerHTML=goals.map(function(g){
+    return '<div class="goal-row"><div class="goal-ico" style="background:var(--bg3);">'+g.icon+'</div><div class="goal-info"><div class="goal-label">'+g.label+'</div><div class="btrack"><div class="bfill" style="width:'+g.pct+'%;background:'+g.color+';"></div></div></div><span class="goal-pct" style="color:'+g.color+';">'+g.pct+'%</span></div>';
+  }).join('');
+  liveData.newGoals.forEach(function(g){
+    list.innerHTML+='<div class="goal-row"><div class="goal-ico" style="background:var(--bg3);">🎯</div><div class="goal-info"><div class="goal-label">'+g.label+'</div><div class="btrack"><div class="bfill" style="width:0%;background:var(--b);"></div></div></div><span class="goal-pct" style="color:var(--b);">0%</span></div>';
+  });
+}
+function addGoal(){
+  var type=document.getElementById('goal-type').value;
+  var val=document.getElementById('goal-val').value;
+  if(!val)return;
+  var labels={mensuel:'Reduction mensuelle de '+val+'%',quotidien:'Limite quotidienne: '+val+' kWh',veille:'Zero veille pendant '+val+' jours'};
+  liveData.newGoals.push({label:labels[type]});
+  buildGoals();
+}
+
+// ════════════════════════════════════════
+//  COMPARE
+// ════════════════════════════════════════
+function buildCompare(){
+  var el=document.getElementById('compare-bars');if(!el)return;
+  var data=[
+    {label:'Vous',val:312,pct:73,color:'var(--g)'},
+    {label:'Voisins proches',val:368,pct:87,color:'var(--a)'},
+    {label:'Moyenne ville',val:425,pct:100,color:'var(--r)'},
+    {label:'Meilleure pratique',val:220,pct:52,color:'var(--b)'},
+    {label:'Norme nationale',val:450,pct:106,color:'var(--text3)'}
+  ];
+  el.innerHTML=data.map(function(d){
+    return '<div class="compare-bar"><span class="compare-label">'+d.label+'</span><div class="compare-track"><div class="compare-fill" style="width:'+d.pct+'%;background:'+d.color+';"></div></div><span class="compare-val" style="color:'+d.color+';">'+d.val+' kWh</span></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  PROFILE
+// ════════════════════════════════════════
+function buildProfile(){
+  var u=CU;
+  var ini=((u.prenom||'')[0]||'')+((u.nom||'')[0]||'');
+  document.getElementById('p-av').textContent=ini.toUpperCase();
+  var fields=[
+    {k:'Prenom & Nom',v:u.prenom+' '+u.nom},
+    {k:'Email',v:u.email},
+    {k:'Ville',v:u.ville||'-'},
+    {k:'Logement',v:(u.type||'').charAt(0).toUpperCase()+(u.type||'').slice(1)+' — '+(u.surface||'?')+'m2'},
+    {k:'Role',v:u.role==='admin'?'Administrateur':'Utilisateur'},
+    {k:'Objectif mensuel',v:(u.target||350)+' kWh'},
+    {k:'Seuil d\'alerte',v:(u.thresh||20)+' kWh/jour'},
+    {k:'Tarif',v:(u.tariff||4.94)+' DA/kWh'}
+  ];
+  document.getElementById('p-fields').innerHTML=fields.map(function(f){return '<div class="pfield"><span class="pkey">'+f.k+'</span><span class="pval">'+f.v+'</span></div>';}).join('');
+  document.getElementById('e-target').value=u.target||350;
+  document.getElementById('e-tariff').value=u.tariff||4.94;
+  document.getElementById('e-thresh').value=u.thresh||20;
+  document.getElementById('e-pers').value=u.pers||4;
+}
+function saveProf(){
+  CU.target=parseInt(document.getElementById('e-target').value)||350;
+  CU.tariff=parseFloat(document.getElementById('e-tariff').value)||4.94;
+  CU.thresh=parseInt(document.getElementById('e-thresh').value)||20;
+  CU.pers=parseInt(document.getElementById('e-pers').value)||4;
+  buildProfile();
+  var s=document.getElementById('p-saved');s.style.display='block';setTimeout(function(){s.style.display='none';},2500);
+}
+
+// ════════════════════════════════════════
+//  ADMIN
+// ════════════════════════════════════════
+function buildAdminTable(){
+  var tb=document.getElementById('adm-table');if(!tb)return;
+  tb.innerHTML=USERS.map(function(u){
+    return '<tr><td><strong>'+u.prenom+' '+u.nom+'</strong></td><td>'+u.email+'</td><td><span class="badge '+(u.role==='admin'?'br':'bb')+'">'+u.role+'</span></td><td>'+u.type+' '+u.surface+'m2</td><td><span class="badge bg">Actif</span></td></tr>';
+  }).join('');
+  document.getElementById('adm-u').textContent=USERS.length;
+}
+
+// ════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════
+function exportCSV(){
+  var csv='Date,Consommation kWh,Cout DA,Objectif kWh\n';
+  var months=['Oct','Nov','Dec','Jan','Fev','Mars'];
+  liveData.history.forEach(function(v,i){csv+=months[i]+','+v+','+(v*(CU?CU.tariff:4.94)).toFixed(0)+','+[380,380,380,350,350,350][i]+'\n';});
+  var bl=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='ENRG_donnees.csv';a.click();
+}
+function exportReport(){
+  var txt='RAPPORT MENSUEL — ENRG Smart Energy Saving System\n'+'='.repeat(50)+'\n\nUtilisateur  : '+(CU?CU.prenom+' '+CU.nom:'')+'\nDate rapport : '+new Date().toLocaleDateString('fr-FR')+'\nLogement     : '+(CU?CU.type+' — '+CU.surface+'m2':'')+'\n\n--- CONSOMMATION ---\nCe mois      : '+liveData.month+' kWh\nObjectif     : '+(CU?CU.target:350)+' kWh\nEcart        : '+(liveData.month-(CU?CU.target:350))+' kWh\nFacture      : '+Math.round(liveData.month*(CU?CU.tariff:4.94))+' DA\n\n--- HISTORIQUE 6 MOIS ---\n';
+  ['Oct','Nov','Dec','Jan','Fev','Mars'].forEach(function(m,i){txt+='  '+m+' : '+liveData.history[i]+' kWh  ('+Math.round(liveData.history[i]*(CU?CU.tariff:4.94))+' DA)\n';});
+  txt+='\n--- ALERTES ACTIVES ---\n';
+  liveData.alerts.filter(function(a){return !a.read;}).forEach(function(a){txt+='  ['+a.type.toUpperCase()+'] '+a.title+'\n';});
+  txt+='\nGenere par ENRG Smart Energy Saving System\nProjet AGL 2025/2026 — Dr. Amri Manel\nEquipe: Nour Guesmi, Doua Nasri, Ranim Nasri, Ranim Bejaoui, Takoua Kochbati, Sahar Chouikh, Imen Boulifi\n';
+  var bl=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='ENRG_rapport_mensuel.txt';a.click();
+}
+
+// ════════════════════════════════════════
+//  MINI CHART ENGINE
+// ════════════════════════════════════════
+function mkCtx(canvas,h){
+  var W=canvas.parentElement.clientWidth||500;
+  canvas.width=W;canvas.height=h||240;
+  return {ctx:canvas.getContext('2d'),W:W,H:h||240};
+}
+function gridLines(ctx,W,H,pad,min,max,steps){
+  steps=steps||4;
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=0.5;
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='right';
+  for(var i=0;i<=steps;i++){
+    var y=pad.t+i*(H-pad.t-pad.b)/steps;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    var v=max-(i/steps)*(max-min);
+    ctx.fillText(v%1===0?v:v.toFixed(1),pad.l-4,y+3);
+  }
+}
+function drawBar(canvas,data,labels,colors){
+  var r=mkCtx(canvas);var ctx=r.ctx,W=r.W,H=r.H;
+  ctx.clearRect(0,0,W,H);
+  var pad={t:20,r:16,b:36,l:48};
+  var pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+  var maxV=Math.max.apply(null,data)*1.18||1;
+  function toY(v){return pad.t+ph-(v/maxV)*ph;}
+  gridLines(ctx,W,H,pad,0,Math.round(maxV),4);
+  var bw=Math.min(pw/data.length*0.65,56);var gap=pw/data.length;
+  data.forEach(function(v,i){
+    var x=pad.l+i*gap+(gap-bw)/2;
+    var c=Array.isArray(colors)?colors[i]:(colors||'#00C896');
+    var grad=ctx.createLinearGradient(0,toY(v),0,toY(0));
+    grad.addColorStop(0,c);grad.addColorStop(1,c+'44');
+    ctx.fillStyle=grad;
+    ctx.fillRect(x,toY(v),bw,toY(0)-toY(v));
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='11px JetBrains Mono,monospace';ctx.textAlign='center';
+    if(labels&&labels[i])ctx.fillText(labels[i],x+bw/2,H-8);
+  });
+  return {destroy:function(){ctx.clearRect(0,0,W,H);}};
+}
+function drawLine(canvas,datasets,labels){
+  var r=mkCtx(canvas);var ctx=r.ctx,W=r.W,H=r.H;
+  ctx.clearRect(0,0,W,H);
+  var pad={t:20,r:16,b:36,l:48};
+  var pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+  var allV=datasets.flatMap(function(d){return d.data;});
+  var minV=0,maxV=Math.max.apply(null,allV)*1.12||1;
+  function toY(v){return pad.t+ph-((v-minV)/(maxV-minV||1))*ph;}
+  function toX(i){return pad.l+(i/(labels.length-1||1))*pw;}
+  gridLines(ctx,W,H,pad,minV,Math.round(maxV),4);
+  datasets.forEach(function(d){
+    var pts=d.data.map(function(v,i){return{x:toX(i),y:toY(v)};});
+    ctx.strokeStyle=d.color||'#00C896';ctx.lineWidth=2.5;
+    if(d.dash)ctx.setLineDash(d.dash);else ctx.setLineDash([]);
+    ctx.beginPath();
+    if(d.smooth){
+      ctx.moveTo(pts[0].x,pts[0].y);
+      for(var i=1;i<pts.length;i++){var cpx=(pts[i].x+pts[i-1].x)/2;ctx.bezierCurveTo(cpx,pts[i-1].y,cpx,pts[i].y,pts[i].x,pts[i].y);}
+    } else {
+      pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
+    }
+    ctx.stroke();ctx.setLineDash([]);
+    if(d.fill){
+      ctx.lineTo(pts[pts.length-1].x,toY(0));ctx.lineTo(pts[0].x,toY(0));ctx.closePath();
+      ctx.fillStyle=d.fillColor||d.color+'22';ctx.fill();
+    }
+    if(d.dots!==false){pts.forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fillStyle=d.color||'#00C896';ctx.fill();});}
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='center';
+    labels.forEach(function(lb,i){if(i%(Math.ceil(labels.length/6))===0)ctx.fillText(lb,toX(i),H-8);});
+  });
+}
+function drawDoughnut(canvas,data,colors){
+  var r=mkCtx(canvas);var ctx=r.ctx,W=r.W,H=r.H;
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2,cy=H/2,radius=Math.min(cx,cy)-15;
+  var total=data.reduce(function(a,b){return a+b;},0);
+  var angle=-Math.PI/2;
+  data.forEach(function(v,i){
+    var sl=(v/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,radius,angle,angle+sl);ctx.closePath();
+    ctx.fillStyle=colors[i]||'#666';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,radius*0.6,0,Math.PI*2);
+    ctx.fillStyle='#13161D';ctx.fill();
+    angle+=sl;
+  });
+}
+function drawLiveChart(){
+  var c=document.getElementById('c-live');if(!c||!c.parentElement)return;
+  var r=mkCtx(c,220);var ctx=r.ctx,W=r.W,H=r.H;
+  ctx.clearRect(0,0,W,H);
+  var data=liveData.liveHistory;
+  var pad={t:20,r:16,b:36,l:48};
+  var pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+  var maxV=Math.max.apply(null,data)*1.2||1,minV=0;
+  function toY(v){return pad.t+ph-((v-minV)/(maxV-minV||1))*ph;}
+  function toX(i){return pad.l+(i/(data.length-1||1))*pw;}
+  gridLines(ctx,W,H,pad,0,Math.round(maxV),4);
+  var pts=data.map(function(v,i){return{x:toX(i),y:toY(v)};});
+  // Fill
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(var i=1;i<pts.length;i++){var cpx=(pts[i].x+pts[i-1].x)/2;ctx.bezierCurveTo(cpx,pts[i-1].y,cpx,pts[i].y,pts[i].x,pts[i].y);}
+  ctx.lineTo(pts[pts.length-1].x,toY(0));ctx.lineTo(pts[0].x,toY(0));ctx.closePath();
+  var grad=ctx.createLinearGradient(0,pad.t,0,H);grad.addColorStop(0,'rgba(0,200,150,0.35)');grad.addColorStop(1,'rgba(0,200,150,0.02)');
+  ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.strokeStyle='#00C896';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(var j=1;j<pts.length;j++){var cpx2=(pts[j].x+pts[j-1].x)/2;ctx.bezierCurveTo(cpx2,pts[j-1].y,cpx2,pts[j].y,pts[j].x,pts[j].y);}
+  ctx.stroke();
+  // Last point glow
+  var last=pts[pts.length-1];
+  ctx.beginPath();ctx.arc(last.x,last.y,5,0,Math.PI*2);ctx.fillStyle='#00C896';ctx.fill();
+  ctx.beginPath();ctx.arc(last.x,last.y,9,0,Math.PI*2);ctx.fillStyle='rgba(0,200,150,0.3)';ctx.fill();
+}
+
+function drawAllCharts(){
+  // Hourly
+  var ch=document.getElementById('c-hourly');
+  if(ch&&ch.parentElement.clientWidth>0){
+    var r=mkCtx(ch,220);var ctx=r.ctx,W=r.W,H=r.H;
+    ctx.clearRect(0,0,W,H);
+    var data=liveData.hourly;var pad={t:20,r:16,b:36,l:48};
+    var pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+    var maxV=Math.max.apply(null,data)*1.2;
+    function toY(v){return pad.t+ph-(v/maxV)*ph;}
+    gridLines(ctx,W,H,pad,0,maxV.toFixed(1),4);
+    var bw=Math.max(4,(pw/24)*0.72);
+    data.forEach(function(v,i){
+      var x=pad.l+i*(pw/24)+(pw/24-bw)/2;
+      var isHigh=v>1;
+      var grad=ctx.createLinearGradient(0,toY(v),0,toY(0));
+      if(isHigh){grad.addColorStop(0,'#FF9500');grad.addColorStop(1,'#FF950044');}
+      else{grad.addColorStop(0,'#00C896');grad.addColorStop(1,'#00C89622');}
+      ctx.fillStyle=grad;ctx.fillRect(x,toY(v),bw,toY(0)-toY(v));
+      if(i%4===0){ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='center';ctx.fillText(i+'h',x+bw/2,H-8);}
+    });
+  }
+  // Doughnut
+  var cp=document.getElementById('c-pie');
+  var catL=['Chauffage','Appareils','Eclairage','Eau chaude','Electro'];
+  var catD=[38,25,12,15,10];
+  var catC=['#00C896','#0A84FF','#FF9500','#BF5AF2','#FF453A'];
+  var leg=document.getElementById('pie-leg');
+  if(leg)leg.innerHTML=catL.map(function(l,i){return '<span><span class="ldot" style="background:'+catC[i]+';"></span>'+l+' '+catD[i]+'%</span>';}).join('');
+  if(cp)drawDoughnut(cp,catD,catC);
+  // Sim initial
+  simU();
+}
+
+function drawReportCharts(){
+  var ch=document.getElementById('c-hist');
+  if(ch)drawLine(ch,[{data:liveData.history,color:'#00C896',fill:true,fillColor:'rgba(0,200,150,0.12)',smooth:true},{data:[380,380,380,350,350,350],color:'#FF9500',dash:[6,4],dots:false}],['Oct','Nov','Dec','Jan','Fev','Mars']);
+  // Rooms bar
+  var cr=document.getElementById('c-rooms');
+  if(cr)drawBar(cr,[4.2,3.8,1.5,2.1,2.6],['Salon','Cuisine','Chambre','S.Bain','Bureau'],['#00C896','#0A84FF','#BF5AF2','#FF9500','#FF453A']);
+  // Weekly
+  var cw=document.getElementById('c-week');
+  if(cw)drawBar(cw,liveData.weekly,['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],liveData.weekly.map(function(v){return v>55?'#FF9500':'#00C896';}));
+}
+function drawCompareChart(){
+  var cc=document.getElementById('c-compare');
+  if(cc)drawLine(cc,[{data:liveData.history,color:'#00C896',fill:true,fillColor:'rgba(0,200,150,0.1)',smooth:true},{data:liveData.national,color:'#FF453A',dash:[5,4],dots:false}],['Oct','Nov','Dec','Jan','Fev','Mars']);
+}
+</script>
+</body>
+</html>
