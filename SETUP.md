@@ -1,63 +1,63 @@
-# 🚀 Guide d'installation — Smart Energy Saving System
+🚀 Guide d'installation — ENRG Smart Energy Saving System
+====================================================================
 
-## 📋 Prérequis
-- Node.js v18+
-- Docker & Docker Compose
+**Site Web de démonstration** — Prototype Frontend + Backend PHP + PostgreSQL
+
+---
+
+### 📋 Prérequis
+
+- PHP 8.0 ou supérieur (avec extension `pdo_pgsql`)
+- PostgreSQL 15+
+- Serveur web XAMPP
 - Git
 
-## ⚙️ Installation
+---
 
-### 1. Cloner le repository
+### ⚙️ Installation
+
+#### 1. Cloner le repository
+
 ```bash
 git clone https://github.com/doua98/smart-energy-saving-system.git
 cd smart-energy-saving-system
-```
 
-### 2. Lancer avec Docker
-```bash
-docker-compose up --build
-```
+#### 2. Configurer la base de données
 
-### 3. Initialiser la base de données
-```bash
-docker exec -i enrg_db psql -U user -d enrg_db < database/schema.sql
-docker exec -i enrg_db psql -U user -d enrg_db < database/seed.sql
-```
+CREATE DATABASE AGL_db;
 
-## 🌐 URLs de l'application
+#### 3. Lancer le site
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000 |
-| InfluxDB | http://localhost:8086 |
-| MQTT Broker | mqtt://localhost:1883 |
+cd frontend
+php -S localhost:8000
 
-## 👥 Équipe
-| Membre | Rôle | GitHub |
-|--------|------|--------|
-| Doua Nasri | Chef de projet | @doua98 |
-| Ranim M. Nasri | Backend | @ranim-nasri |
-| Nour Guesmi | UI/UX | @nour-guesmi |
-| Ranim Bejaoui | Frontend | @ranim-bejaoui |
-| Takoua Kochbati | Backend | @takoua-k |
-| Sahar Chouikh | Admin système | @sahar-c |
-| Imen Boulifi | QA & Tests | @imen-b |
+🌐 Accès à l'application
 
-## 📁 Structure du projet
+Frontend (Site Web) → http://localhost:8000
+Backend API → http://localhost/backend/api/
+Base de données → PostgreSQL (port 5432)
+
+👥 Équipe — ISG Bizerte | AGL 2026/2027
+
+Doua Nasri
+Ranim M. Nasri
+Nour Guesmi
+Ranim Bejaoui
+Takoua Kochbati
+Sahar Chouikh
+Imen Boulifi
+
 smart-energy-saving-system/
-├── frontend/          → Interface React.js
-├── backend/           → API REST Node.js
+├── frontend/           → Interface (HTML + CSS + JavaScript)
+├── backend/            → API REST en PHP
 ├── database/
-│   ├── schema.sql     → Structure des tables
-│   └── seed.sql       → Données de test
-├── docs/              → Diagrammes UML, CDC
-├── .github/workflows/ → CI/CD Pipeline
-├── docker-compose.yml → Services Docker
-└── SETUP.md           → Ce fichier
+│   ├── schema.sql
+│   └── seed.sql
+├── docs/               → Diagrammes UML & Cahier des charges
+└── README.md
 
-## 🔑 Variables d'environnement
-Copier `.env.example` vers `.env` et remplir les valeurs.
+📞 Encadrante
+Dr. Yasmine Chaabani — ISG Bizerte | AGL 2026/2027
 
-## 📞 Encadrante
-**Dr. Yasmine Chaabani** — ISG Bizerte | AGL 2025/2026
+Dernière mise à jour : 15 Avril 2026
+Note : Ce prototype est un site web statique amélioré avec backend PHP connecté à PostgreSQL. Il respecte le cahier des charges et est prêt pour la démonstration.
