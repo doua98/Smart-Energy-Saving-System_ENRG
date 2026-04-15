@@ -36,12 +36,6 @@
 
 ---
 
-### 🚀 Encadrante
-
-**Dr. Manel Amri** — ISG Bizerte
-
----
-
 **Dernière mise à jour :** Avril 2026
 - Gestion des tickets : Jira
 
